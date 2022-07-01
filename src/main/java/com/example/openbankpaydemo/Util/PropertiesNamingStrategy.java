@@ -13,12 +13,12 @@ public class PropertiesNamingStrategy extends PropertyNamingStrategy {
 
     @Override
     public String nameForGetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
-        return convert(method.getName().toString());
+        return convert(method.getName());
     }
 
     @Override
     public String nameForSetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
-        return convert(method.getName().toString());
+        return convert(method.getName());
     }
 
     private String convert(String input) {

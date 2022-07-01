@@ -4,6 +4,8 @@ import com.example.openbankpaydemo.Model.AccountTransfer;
 import com.example.openbankpaydemo.Service.HttpMethod;
 import com.example.openbankpaydemo.Util.JacksonUtil;
 import com.example.openbankpaydemo.Util.PropertiesUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +19,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/transfer")
 public class TransferController {
+
+    private static final Logger logger = LogManager.getLogger(HeaderController.class);
 
     @PostMapping(value = "/withdraw")
     public ResponseEntity<String> withdraw(@RequestParam String finAccount,
@@ -34,7 +38,7 @@ public class TransferController {
         transfer.setMractOtlt(depositDetail);
 
         String headerJson = JacksonUtil.serialization(transfer);
-        System.out.println("header : " + headerJson);
+        logger.info("header : " + headerJson);
 
         HttpMethod httpMethod = new HttpMethod(PropertiesUtil.getProperty("url.nhApi") + apiName + ".nh");
         ResponseEntity<String> response = httpMethod.postRequest(headerJson);
@@ -75,7 +79,7 @@ public class TransferController {
         transfer.setMractOtlt(depositDetail);
 
         String headerJson = JacksonUtil.serialization(transfer);
-        System.out.println("header : " + headerJson);
+        logger.info("header : " + headerJson);
 
         HttpMethod httpMethod = new HttpMethod(PropertiesUtil.getProperty("url.nhApi") + apiName + ".nh");
         ResponseEntity<String> response = httpMethod.postRequest(headerJson);

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -29,9 +28,10 @@ public class AccountCheckController {
     
     @Autowired
     TransactionRepository transactionRepository;
+
     @PostMapping(value = "/checkBalance")
     public ResponseEntity<String> checkAccountBalance(@RequestParam String finAccount) throws IOException, InterruptedException {
-        final String uuid = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+        final String uuid = UUID.randomUUID().toString().replace("-", "").substring(0, 20); // IsTuno 20글자 제한
         final String apiName = "InquireBalance";
         Balance balance = new Balance(apiName, uuid);
         balance.setFinAcno(finAccount);
@@ -42,12 +42,12 @@ public class AccountCheckController {
         transaction.setTrType(apiName);
 
         String headerJson = JacksonUtil.serialization(balance);
-        System.out.println("header : " + headerJson);
+        logger.info("header : " + headerJson);
 
         HttpMethod httpMethod = new HttpMethod(PropertiesUtil.getProperty("url.nhApi") + apiName + ".nh");
         ResponseEntity<String> response = httpMethod.postRequest(headerJson);
 
-        transactionRepository.save(transaction);
+        transactionRepository.saveAndFlush(transaction);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }
@@ -58,25 +58,25 @@ public class AccountCheckController {
                                                      @RequestParam(required = false, defaultValue = "true") boolean isNHBank) throws IOException, InterruptedException {
 
 
-        final String uuid = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
-        String apiName = "";
+        String uuid = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+        StringBuffer sb = new StringBuffer();
 
-        System.out.println(isNHBank);
+        logger.info(isNHBank);
 
         if(isNHBank){
             if(!(bankCode.equals("011") || bankCode.equals("012"))){
                 return new ResponseEntity("bankcode is not matching.", HttpStatus.BAD_REQUEST);
             }
-            apiName = "InquireDepositorAccountNumber";
+            sb.append("InquireDepositorAccountNumber");
         } // 농협은행
         else{
             if((bankCode.equals("011") || bankCode.equals("012"))){
                 return new ResponseEntity("bankcode is not matching.", HttpStatus.BAD_REQUEST);
             }
-            apiName = "InquireDepositorOtherBank";
+            sb.append("InquireDepositorOtherBank");
         } // 외부 은행
 
-        Holder holder = new Holder(apiName, uuid);
+        Holder holder = new Holder(sb.toString(), uuid);
         holder.setBncd(bankCode);
         holder.setAcno(accountNum);
 
@@ -84,15 +84,15 @@ public class AccountCheckController {
         transaction.setTrId(uuid);
         transaction.setDstBnkCode(bankCode);
         transaction.setDstAccount(accountNum);
-        transaction.setTrType(apiName);
+        transaction.setTrType(sb.toString());
 
         String headerJson = JacksonUtil.serialization(holder);
-        System.out.println("header : " + headerJson);
+        logger.info("header : " + headerJson);
 
-        HttpMethod httpMethod = new HttpMethod(PropertiesUtil.getProperty("url.nhApi") + apiName + ".nh");
+        HttpMethod httpMethod = new HttpMethod(PropertiesUtil.getProperty("url.nhApi") + sb + ".nh");
         ResponseEntity<String> response = httpMethod.postRequest(headerJson);
 
-        transactionRepository.save(transaction);
+        transactionRepository.saveAndFlush(transaction);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }
