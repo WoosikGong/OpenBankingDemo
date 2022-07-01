@@ -1,21 +1,18 @@
 package com.example.openbankpaydemo.Entity;
 
 
+import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Setter
 @Getter
-@Table(name = "Transaction")
+@Table(name = "bnkTransaction")
 public class BnkTransaction {
     @Id
-    @GeneratedValue
 
     String trId;
     String srcAccount;

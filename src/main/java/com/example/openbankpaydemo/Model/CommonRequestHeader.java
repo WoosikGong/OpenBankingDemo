@@ -1,6 +1,5 @@
 package com.example.openbankpaydemo.Model;
 
-import com.example.openbankpaydemo.Util.isTunoCounter;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -6,6 +6,8 @@ import com.example.openbankpaydemo.Repository.TransactionRepository;
 import com.example.openbankpaydemo.Service.HttpMethod;
 import com.example.openbankpaydemo.Util.JacksonUtil;
 import com.example.openbankpaydemo.Util.PropertiesUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/fin")
 public class FinAccountController {
+
+    private static final Logger logger = LogManager.getLogger(HeaderController.class);
 
     @Autowired
     TransactionRepository transactionRepository;
@@ -46,7 +50,7 @@ public class FinAccountController {
         transaction.setTrType(apiName);
 
         String headerJson = JacksonUtil.serialization(finAccountIssuance);
-        System.out.println("header : " + headerJson);
+        logger.info("header : " + headerJson);
 
         HttpMethod httpMethod = new HttpMethod(PropertiesUtil.getProperty("url.nhApi") + apiName + ".nh");
         ResponseEntity<String> response = httpMethod.postRequest(headerJson);
@@ -72,7 +76,7 @@ public class FinAccountController {
         transaction.setTrId(uuid);
 
         String headerJson = JacksonUtil.serialization(finAccountIssuance);
-        System.out.println("header : " + headerJson);
+        logger.info("header : " + headerJson);
 
         HttpMethod httpMethod = new HttpMethod(PropertiesUtil.getProperty("url.nhApi") + apiName + ".nh");
         ResponseEntity<String> response = httpMethod.postRequest(headerJson);
